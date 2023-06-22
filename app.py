@@ -2,10 +2,12 @@ from flask import Flask, render_template, request
 import openai
 import json
 import numpy as np
+import re
+import string
 
 app = Flask(__name__)
 
-openai.api_key = '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'  # 替换为您的 OpenAI API 密钥
+openai.api_key = '****************'  # 替换为您的 OpenAI API 密钥
 
 # 定义属性向量化函数和其他辅助函数
 # ...
@@ -115,6 +117,20 @@ Output: 把这个描述语句转换为评分表。
 with open('character.json', 'r', encoding='utf-8') as file:
     hero_ratings = json.load(file)
 #print(hero_ratings)
+
+
+
+def preprocess_text(text):
+
+    # 去除标点符号
+    text = text.translate(str.maketrans("", "", string.punctuation))
+
+    # 去除多余的空格
+    text = re.sub("\s+", " ", text)
+
+    # 可以根据需要添加其他预处理步骤，例如去除停用词、数字等
+
+    return text
 
 
 # 定义one-hot编码函数
@@ -227,6 +243,9 @@ def index():
 @app.route('/recommend', methods=['POST'])
 def recommend():
     q = request.form['description']
+    #预处理文本
+    q=preprocess_text(q)
+    ###
     result = evaluate(q)
     return render_template('result.html', result=result)
 
